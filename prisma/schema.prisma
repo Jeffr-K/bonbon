@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  username  String
+  password  String
+  admin     Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  carts     Cart[]
+  orders    Order[]
+  reviews   Review[]
+  comments  Comment[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  root      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  products  Product[]
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String
+  description String
+  price       Int
+  stock       Int
+  likes       Int       @default(0)
+  views       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  reviews     Review[]
+  carts       Cart[]
+  orders      Order[]
+  images      File[]    @relation("ProductImages")
+}
+
+model Review {
+  id        String    @id @default(uuid())
+  content   String
+  rating    Int
+  productId String
+  userId    String
+  product   Product   @relation(fields: [productId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  images    File[]    @relation("ReviewImages")
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  reviewId  String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  review    Review    @relation(fields: [reviewId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Cart {
+  id        String    @id @default(uuid())
+  userId    String
+  productId String
+  quantity  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  productId String
+  quantity  Int
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  deletedAt DateTime?
+  user      User        @relation(fields: [userId], references: [id])
+  product   Product     @relation(fields: [productId], references: [id])
+}
+
+model File {
+  id        String    @id @default(uuid())
+  type      String
+  name      String
+  path      String
+  mimetype  String
+  size      Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  product   Product?  @relation("ProductImages", fields: [productId], references: [id])
+  productId String?
+  review    Review?   @relation("ReviewImages", fields: [reviewId], references: [id])
+  reviewId  String?
+}
