@@ -8,26 +8,28 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  username  String
-  password  String
-  admin     Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  carts     Cart[]
-  orders    Order[]
-  reviews   Review[]
-  comments  Comment[]
+  id           String    @id @default(uuid())
+  email        String    @unique
+  username     String
+  password     String
+  admin        Boolean   @default(false)
+  organization String?   @default("미정")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  carts        Cart[]
+  orders       Order[]
 }
 
 model Category {
-  id        String    @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  root      Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  root      Boolean    @default(false)
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  parentId  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   deletedAt DateTime?
   products  Product[]
 }
@@ -45,49 +47,21 @@ model Product {
   deletedAt   DateTime?
   categoryId  String
   category    Category  @relation(fields: [categoryId], references: [id])
-  reviews     Review[]
   carts       Cart[]
   orders      Order[]
   images      File[]    @relation("ProductImages")
 }
 
-model Review {
-  id        String    @id @default(uuid())
-  content   String
-  rating    Int
-  productId String
-  userId    String
-  product   Product   @relation(fields: [productId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
-  comments  Comment[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  images    File[]    @relation("ReviewImages")
-}
-
-model Comment {
-  id        String    @id @default(uuid())
-  content   String
-  reviewId  String
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  review    Review    @relation(fields: [reviewId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-}
-
 model Cart {
   id        String    @id @default(uuid())
-  userId    String
-  productId String
   quantity  Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   user      User      @relation(fields: [userId], references: [id])
+  userId    String
   product   Product   @relation(fields: [productId], references: [id])
+  productId String
 }
 
 enum OrderStatus {
@@ -108,6 +82,17 @@ model Order {
   deletedAt DateTime?
   user      User        @relation(fields: [userId], references: [id])
   product   Product     @relation(fields: [productId], references: [id])
+  history   OrderHistory[]
+}
+
+model OrderHistory {
+  id        String    @id @default(uuid())
+  event     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  order     Order     @relation(fields: [orderId], references: [id])
+  orderId   String
 }
 
 model File {
@@ -122,6 +107,11 @@ model File {
   deletedAt DateTime?
   product   Product?  @relation("ProductImages", fields: [productId], references: [id])
   productId String?
-  review    Review?   @relation("ReviewImages", fields: [reviewId], references: [id])
-  reviewId  String?
+}
+
+model Receipt {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
