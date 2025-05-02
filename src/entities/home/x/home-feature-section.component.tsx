@@ -26,7 +26,7 @@ export default function FeaturesSection() {
         <div className="text-center p-10 bg-white rounded-xl shadow-lg transition-transform duration-300 ease-in-out hover:-translate-y-2.5 animate-float" style={{animationDelay: '0.6s'}}>
           <FaShoppingBag className="text-5xl text-[#e67e22] mb-5 mx-auto" />
           <h3 className="text-2xl text-[#2c3e50] mb-4 font-medium">단체 주문</h3>
-          <p className="text-gray-600 leading-relaxed">10인 이상 단체 주문 시 특별한 혜택을 제공해드립니다.</p>
+          <p className="text-gray-600 leading-relaxed">10인 이상 단체 주문 시 특별한 혜택을 제공해드려요.</p>
         </div>
       </div>
     </div>

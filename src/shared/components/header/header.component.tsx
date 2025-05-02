@@ -16,7 +16,7 @@ export default function Header() {
     setShowLoginModal(false);
   };
 
-  // 모달 외부 클릭 감지 핸들러
+  // 모달 외부 클릭 핸들러
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -246,9 +246,6 @@ export default function Header() {
           </div>
         </div>
       )}
-
-      {/* 헤더 높이만큼 여백 추가 */}
-      <div className="h-16"></div>
     </>
   );
 }
